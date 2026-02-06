@@ -4,6 +4,10 @@ This repository contains the source code and base assets for the game engine and
 
 See the [Crazy Core](https://github.com/mellinoe/CrazyCore) repository for a more complete view of how the engine can be used.
 
+## Fork info
+
+I have forked this engine to fully update and improve it that will fit the purpose I am going to use it for
+
 ## Features
 
 ### Graphics
