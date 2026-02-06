@@ -45,7 +45,7 @@ namespace Engine.Editor
                 obj = CreateNewObject();
                 return true;
             }
-            if (ImGui.IsLastItemHovered())
+            if (ImGui.IsItemHovered())
             {
                 ImGui.SetTooltip($"Create a new {TypeDrawn.Name}.");
             }
@@ -273,9 +273,9 @@ namespace Engine.Editor
             for (int i = 0; i < 200; i++) { stackBytes[i] = 0; }
             IntPtr ansiStringPtr = Marshal.StringToHGlobalAnsi(s);
             SharpDX.Utilities.CopyMemory(stringStorage, ansiStringPtr, s.Length);
-            float stringWidth = ImGui.GetTextSize(label).X;
+            float stringWidth = ImGui.CalcTextSize(label).X;
             ImGui.PushItemWidth(stringWidth + 10);
-            result |= ImGui.InputText(label, stringStorage, 200, InputTextFlags.Default, null);
+            result |= ImGui.InputText(label, stringStorage, 200, ImGuiInputTextFlags.None, null); // TODO: "None" might be wrong
             ImGui.PopItemWidth();
             if (result)
             {
@@ -303,7 +303,7 @@ namespace Engine.Editor
         public static bool DrawSingle(string label, ref float f, RenderContext rc)
         {
             ImGui.PushItemWidth(50f);
-            bool result = ImGui.DragFloat(label, ref f, -1000f, 1000f, 0.05f, f.ToString(), 1f);
+            bool result = ImGui.DragFloat(label, ref f, -1000f, 1000f, 0.05f, f.ToString(), ImGuiSliderFlags.None); // TODO: 1f = ImGuiSliderFlags ?
             ImGui.PopItemWidth();
             return result;
         }
@@ -330,7 +330,7 @@ namespace Engine.Editor
         internal static bool DrawRgbaFloat(string label, ref RgbaFloat obj, RenderContext rc)
         {
             var color = obj.ToVector4();
-            bool result = ImGui.ColorEdit4(label, ref color, true);
+            bool result = ImGui.ColorEdit4(label, ref color, ImGuiColorEditFlags.NoSmallPreview); // TODO: This ImGuiColorEditFlags was true
             if (result)
             {
                 obj = new RgbaFloat(color.X, color.Y, color.Z, color.W);
@@ -341,17 +341,17 @@ namespace Engine.Editor
 
         internal static bool DrawVector2(string label, ref Vector2 obj, RenderContext rc)
         {
-            return ImGui.DragVector2(label, ref obj, float.MinValue, float.MaxValue, .1f);
+            return ImGui.DragFloat2(label, ref obj, float.MinValue, float.MaxValue, .1f);
         }
 
         internal static bool DrawVector3(string label, ref Vector3 obj, RenderContext rc)
         {
-            return ImGui.DragVector3(label, ref obj, float.MinValue, float.MaxValue, .1f);
+            return ImGui.DragFloat3(label, ref obj, float.MinValue, float.MaxValue, .1f);
         }
 
         internal static bool DrawVector4(string label, ref Vector4 obj, RenderContext rc)
         {
-            return ImGui.DragVector4(label, ref obj, float.MinValue, float.MaxValue, .1f);
+            return ImGui.DragFloat4(label, ref obj, float.MinValue, float.MaxValue, .1f);
         }
 
         internal static bool DrawQuaternion(string label, ref Quaternion obj, RenderContext rc)
@@ -416,7 +416,7 @@ namespace Engine.Editor
 
             if (ImGui.TreeNode($"{label}[{length}]###{label}"))
             {
-                if (ImGui.IsLastItemHovered())
+                if (ImGui.IsItemHovered())
                 {
                     ImGui.SetTooltip($"{TypeDrawn.GetElementType()}[{arr.Length}]");
                 }
@@ -443,7 +443,7 @@ namespace Engine.Editor
 
                 for (int i = 0; i < length; i++)
                 {
-                    ImGui.PushStyleColor(ColorTarget.Button, RgbaFloat.Red.ToVector4());
+                    ImGui.PushStyleColor(ImGuiCol.Button, RgbaFloat.Red.ToVector4());
                     if (ImGui.Button($"X##{i}", new System.Numerics.Vector2(15, 15)))
                     {
                         ShiftArrayDown(arr, i);
@@ -478,7 +478,7 @@ namespace Engine.Editor
 
                 ImGui.TreePop();
             }
-            else if (ImGui.IsLastItemHovered())
+            else if (ImGui.IsItemHovered())
             {
                 ImGui.SetTooltip($"{TypeDrawn.GetElementType()}[{arr.Length}]");
             }
@@ -524,7 +524,7 @@ namespace Engine.Editor
         {
             ImGui.PushID(label);
 
-            if (!_drawRootNode || ImGui.CollapsingHeader(label, label, true, true))
+            if (!_drawRootNode || ImGui.CollapsingHeader(label, ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.FramePadding))
             {
                 foreach (PropertyInfo pi in _properties)
                 {

@@ -25,6 +25,7 @@ using SharpDX.Direct3D11;
 using SharpFont;
 using Veldrid;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Engine.Editor
 {
@@ -37,11 +38,11 @@ namespace Engine.Editor
             "Transform",
             "GameObject"
         };
-        private static readonly char[] s_pathTrimChar = new char[]
-        {
+        private static readonly char[] s_pathTrimChar =
+        [
             '\"',
             '\''
-        };
+        ];
         private static readonly HashSet<Type> s_newComponentExclusions = new HashSet<Type>()
         {
             typeof(Transform)
@@ -67,9 +68,10 @@ namespace Engine.Editor
         private readonly List<IUpdateable> _updateables = new List<IUpdateable>();
         private readonly List<EditorBehavior> _newStarts = new List<EditorBehavior>();
 
-        private readonly TextInputBuffer _filenameInputBuffer = new TextInputBuffer(256);
-        private readonly TextInputBuffer _assetFileNameBufer = new TextInputBuffer(100);
-        private readonly TextInputBuffer _goNameBuffer = new TextInputBuffer(100);
+        private readonly byte[] _filenameInputBuffer = new byte[256];
+        private readonly byte[] _assetFileNameBuffer = new byte[100];
+        private readonly byte[] _goNameBuffer = new byte[100];
+        private readonly byte[] _physicsLayerInput = new byte[128];
 
         private Camera _sceneCam;
         private readonly GameObject _editorCameraGO;
@@ -183,17 +185,22 @@ namespace Engine.Editor
             }
         }
 
-        private TextInputBuffer _physicsLayerInput = new TextInputBuffer(128);
         private bool PhysicsLayersDrawer(string label, ref PhysicsLayersDescription pld, RenderContext rc)
         {
             for (int i = 0; i < pld.GetLayerCount(); i++)
             {
-                _physicsLayerInput.StringValue = pld.GetLayerName(i);
-                if (ImGui.InputText($"[{i}]", _physicsLayerInput.Buffer, _physicsLayerInput.Length, InputTextFlags.Default, null))
+                // Fill buffer with current layer name
+                Array.Clear(_physicsLayerInput, 0, _physicsLayerInput.Length);
+                Encoding.UTF8.GetBytes(pld.GetLayerName(i), 0, pld.GetLayerName(i).Length, _physicsLayerInput, 0);
+
+                // InputText for layer name
+                if (ImGui.InputText($"[{i}]", _physicsLayerInput, (uint)_physicsLayerInput.Length, ImGuiInputTextFlags.None))
                 {
-                    pld.SetLayerName(i, _physicsLayerInput.StringValue);
+                    string newName = Encoding.UTF8.GetString(_physicsLayerInput).TrimEnd('\0');
+                    pld.SetLayerName(i, newName);
                 }
 
+                // Collision checkboxes
                 for (int g = 0; g < pld.GetLayerCount(); g++)
                 {
                     bool colliding = pld.GetDoLayersCollide(i, g);
@@ -202,7 +209,8 @@ namespace Engine.Editor
                     {
                         pld.SetLayersCollide(i, g, colliding);
                     }
-                    if (ImGui.IsLastItemHovered())
+
+                    if (ImGui.IsItemHovered())
                     {
                         ImGui.SetTooltip($"{pld.GetLayerName(i)} <-> {pld.GetLayerName(g)}");
                     }
@@ -391,7 +399,7 @@ namespace Engine.Editor
             }
 
             Vector3 color = mr.BaseTint.Color;
-            if (ImGui.ColorEdit3("Tint Color", ref color, false))
+            if (ImGui.ColorEdit3("Tint Color", ref color, ImGuiColorEditFlags.NoSmallPreview))
             {
                 c = SetValueActionCommand.New<TintInfo>(val => mr.BaseTint = val, mr.BaseTint, new TintInfo(color, mr.BaseTint.TintFactor));
             }
@@ -445,16 +453,17 @@ namespace Engine.Editor
             AssetID result = default(AssetID);
             AssetID[] assets = database.GetAssetsOfType(typeof(T));
 
-            string[] items = assets.Select(id =>
+            string[] items = [.. assets.Select(id =>
             {
                 return id.Value.Replace("Internal:", string.Empty);
-            }).ToArray();
+            })];
             int selected = 0;
             for (int i = 1; i < items.Length; i++)
             {
                 if (existingRef.ID == assets[i]) { selected = i; break; }
             }
-            if (ImGui.Combo(label, ref selected, items))
+            string itemList = string.Join('\0', items) + '\0'; // extra null at the end
+            if (ImGui.Combo(label, ref selected, itemList, items.Length))
             {
                 result = assets[selected];
             }
@@ -475,7 +484,7 @@ namespace Engine.Editor
             Command c = null;
 
             Vector3 pos = t.LocalPosition;
-            if (ImGui.DragVector3("Position", ref pos, -10000f, 10000f, 0.05f))
+            if (ImGui.DragFloat3("Position", ref pos, -10000f, 10000f, 0.05f))
             {
                 c = SetValueActionCommand.New<Vector3>((val) => t.LocalPosition = val, t.LocalPosition, pos);
             }
@@ -503,7 +512,7 @@ namespace Engine.Editor
             else
             {
                 Vector3 scale = t.LocalScale;
-                if (ImGui.DragVector3("##ScaleDrag", ref scale, .01f, 10000f, 0.05f))
+                if (ImGui.DragFloat3("##ScaleDrag", ref scale, .01f, 10000f, 0.05f))
                 {
                     c = SetValueActionCommand.New<Vector3>((val) => t.LocalScale = val, t.LocalScale, scale);
                 }
@@ -570,7 +579,7 @@ namespace Engine.Editor
 
             if (_windowOpen)
             {
-                if (_input.GetMouseButtonDown(MouseButton.Left) && !ImGui.IsMouseHoveringAnyWindow())
+                if (_input.GetMouseButtonDown(MouseButton.Left) && !ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow))
                 {
                     var screenPos = _input.MousePosition;
                     var ray = _gs.MainCamera.GetRayFromScreenPoint(screenPos.X, screenPos.Y);
@@ -603,14 +612,14 @@ namespace Engine.Editor
                         Math.Min(350, displaySize.X * 0.275f),
                         Math.Min(600, displaySize.Y * 0.6f));
                     Vector2 pos = new Vector2(0, 20);
-                    ImGui.SetNextWindowSize(size, SetCondition.Always);
-                    ImGui.SetNextWindowPos(pos, SetCondition.Always);
+                    ImGui.SetNextWindowSize(size, ImGuiCond.Always);
+                    ImGui.SetNextWindowPos(pos, ImGuiCond.Always);
 
-                    if (ImGui.BeginWindow("Project Assets", WindowFlags.NoCollapse | WindowFlags.NoMove | WindowFlags.NoResize))
+                    if (ImGui.Begin("Project Assets", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize))
                     {
                         DrawProjectAssets();
                     }
-                    ImGui.EndWindow();
+                    ImGui.End();
                 }
 
                 // Hierarchy Editor
@@ -620,14 +629,14 @@ namespace Engine.Editor
                         Math.Min(350, displaySize.X * 0.275f),
                         Math.Min(600, (displaySize.Y * 0.35f) - (_statusBarHeight + 20)));
                     Vector2 pos = new Vector2(0, displaySize.Y * 0.6f + 20);
-                    ImGui.SetNextWindowSize(size, SetCondition.Always);
-                    ImGui.SetNextWindowPos(pos, SetCondition.Always);
+                    ImGui.SetNextWindowSize(size, ImGuiCond.Always);
+                    ImGui.SetNextWindowPos(pos, ImGuiCond.Always);
 
-                    if (ImGui.BeginWindow("Scene Hierarchy", WindowFlags.NoCollapse | WindowFlags.NoMove | WindowFlags.NoResize))
+                    if (ImGui.Begin("Scene Hierarchy", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize))
                     {
                         DrawHierarchy();
                     }
-                    ImGui.EndWindow();
+                    ImGui.End();
                 }
 
                 // Component Editor
@@ -637,45 +646,45 @@ namespace Engine.Editor
                         Math.Min(350, displaySize.X * 0.275f),
                         Math.Min(600, displaySize.Y * 0.75f));
                     Vector2 pos = new Vector2(displaySize.X - size.X, 20);
-                    ImGui.SetNextWindowSize(size, SetCondition.Always);
-                    ImGui.SetNextWindowPos(pos, SetCondition.Always);
+                    ImGui.SetNextWindowSize(size, ImGuiCond.Always);
+                    ImGui.SetNextWindowPos(pos, ImGuiCond.Always);
 
-                    if (ImGui.BeginWindow("Viewer", WindowFlags.NoCollapse | WindowFlags.NoMove | WindowFlags.NoResize))
+                    if (ImGui.Begin("Viewer", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize))
                     {
                         DrawComponentViewer();
                     }
-                    ImGui.EndWindow();
+                    ImGui.End();
                 }
             }
         }
 
         private void DrawStatusBar()
         {
-            IO io = ImGui.GetIO();
-            Vector2 pos = new Vector2(0, io.DisplaySize.Y - _statusBarHeight);
-            ImGui.SetNextWindowPos(pos, SetCondition.Always);
-            ImGui.SetNextWindowSize(new Vector2(io.DisplaySize.X, _statusBarHeight), SetCondition.Always);
-            ImGui.PushStyleVar(StyleVar.WindowRounding, 0);
-            ImGui.PushStyleVar(StyleVar.WindowPadding, new Vector2());
-            ImGui.PushStyleVar(StyleVar.WindowMinSize, new Vector2());
+            ImGuiIOPtr io = ImGui.GetIO();
+            Vector2 pos = new(0, io.DisplaySize.Y - _statusBarHeight);
+            ImGui.SetNextWindowPos(pos, ImGuiCond.Always);
+            ImGui.SetNextWindowSize(new Vector2(io.DisplaySize.X, _statusBarHeight), ImGuiCond.Always);
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2());
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowMinSize, new Vector2());
             Vector4 statusBarColor = _playState == PlayState.Playing ? RgbaFloat.Orange.ToVector4()
                 : _playState == PlayState.Paused ? RgbaFloat.Cyan.ToVector4() : RgbaFloat.Black.ToVector4();
-            ImGui.PushStyleColor(ColorTarget.WindowBg, statusBarColor);
-            if (ImGui.BeginWindow(
+            ImGui.PushStyleColor(ImGuiCol.WindowBg, statusBarColor);
+            if (ImGui.Begin(
                 string.Empty,
-                WindowFlags.NoTitleBar | WindowFlags.NoResize | WindowFlags.NoScrollbar | WindowFlags.NoCollapse))
+                ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoCollapse))
             {
-                ImGui.PushStyleColor(ColorTarget.Text, _statusBarTextColor);
+                ImGui.PushStyleColor(ImGuiCol.Text, _statusBarTextColor);
                 ImGui.Text(_statusBarText);
                 ImGui.PopStyleColor();
                 ImGui.SameLine();
-                var available = ImGui.GetContentRegionAvailableWidth();
-                string stateText = $"State: {_playState.ToString()}";
-                float start = available - ImGui.GetTextSize(stateText).X - 10;
+                var available = ImGui.GetContentRegionAvail().X;
+                string stateText = $"State: {_playState}";
+                float start = available - ImGui.CalcTextSize(stateText).X - 10;
                 ImGui.SameLine(0, start);
                 ImGui.Text(stateText);
             }
-            ImGui.EndWindow();
+            ImGui.End();
 
             ImGui.PopStyleColor();
             ImGui.PopStyleVar(3);
@@ -697,7 +706,7 @@ namespace Engine.Editor
                     ImGui.SetKeyboardFocusHere();
                     _focusNameField = false;
                 }
-                if (ImGui.InputText("###AssetNameInput", _assetFileNameBufer.Buffer, _assetFileNameBufer.Length, InputTextFlags.EnterReturnsTrue, null))
+                if (ImGui.InputText("###AssetNameInput", _assetFileNameBuffer, (uint)_assetFileNameBuffer.Length, ImGuiInputTextFlags.EnterReturnsTrue, null))
                 {
                     save = true;
                 }
@@ -712,7 +721,8 @@ namespace Engine.Editor
                 {
                     FileInfo fi = new FileInfo(_loadedAssetPath);
                     _as.ProjectDatabase.SaveDefinition(_selectedAsset, _loadedAssetPath);
-                    string newPath = Path.Combine(fi.Directory.FullName, _assetFileNameBufer.StringValue);
+                    string newFileName = Encoding.UTF8.GetString(_assetFileNameBuffer).TrimEnd('\0');
+                    string newPath = Path.Combine(fi.Directory.FullName, newFileName);
                     File.Move(_loadedAssetPath, newPath);
                     _loadedAssetPath = newPath;
                 }
@@ -767,18 +777,21 @@ namespace Engine.Editor
                         ClearSelection();
                         _selectedAsset = _as.ProjectDatabase.LoadAsset(asset.Path);
                         _loadedAssetPath = asset.Path;
-                        _assetFileNameBufer.StringValue = asset.Name;
+
+                        // Copy asset name into buffer for InputText
+                        Array.Clear(_assetFileNameBuffer, 0, _assetFileNameBuffer.Length);
+                        Encoding.UTF8.GetBytes(asset.Name, 0, asset.Name.Length, _assetFileNameBuffer, 0);
                     }
                     if (_loadedAssetPath == asset.Path)
                     {
-                        if (ImGui.GetIO().KeysDown[(int)Key.Enter])
-                        {
-                            Type assetType = _as.ProjectDatabase.GetAssetType(asset.Path);
-                            AssetMenuHandler handler = _assetMenuHandlers.GetItem(assetType);
-                            handler.HandleFileOpen(asset.Path);
-                        }
+                        //if (ImGui.GetIO().KeysDown[(int)Key.Enter]) TODO: Reimplement
+                        //{
+                        //    Type assetType = _as.ProjectDatabase.GetAssetType(asset.Path);
+                        //    AssetMenuHandler handler = _assetMenuHandlers.GetItem(assetType);
+                        //    handler.HandleFileOpen(asset.Path);
+                        //}
                     }
-                    if (ImGui.IsLastItemHovered())
+                    if (ImGui.IsItemHovered())
                     {
                         ImGui.SetTooltip(asset.Path);
                     }
@@ -1000,7 +1013,7 @@ namespace Engine.Editor
                     {
                         _parentingTarget = _selectedObjects.First();
                     }
-                    if (ImGui.IsLastItemHovered())
+                    if (ImGui.IsItemHovered())
                     {
                         ImGui.SetTooltip("Selects a GameObject to be used when parenting items with the next menu option.");
                     }
@@ -1031,17 +1044,22 @@ namespace Engine.Editor
 
                     ImGui.EndMenu();
                 }
+                //var io = ImGui.GetIO();
+                //bool ctrlP = io.KeyCtrl && io.KeysDown[(int)ImGuiKey.P]; // modern ImGuiKey enum
+
                 if (ImGui.BeginMenu("Game"))
                 {
-                    if (ImGui.MenuItem("Play", "Ctrl+P", _playState == PlayState.Playing, _playState != PlayState.Playing)
-                        || (ImGui.GetIO().KeysDown[(int)Key.P] && ImGui.GetIO().CtrlPressed) && _currentScene != null)
-                    {
-                        StartSimulation();
-                    }
+                    //if (ImGui.MenuItem("Play", "Ctrl+P", _playState == PlayState.Playing, _playState != PlayState.Playing)  TODO: Reimplement
+                    //    || (ctrlP && _currentScene != null))
+                    //{
+                    //    StartSimulation();
+                    //}
+
                     if (ImGui.MenuItem("Pause", "Ctrl+Shift+P", _playState == PlayState.Paused, _playState == PlayState.Playing))
                     {
                         PauseSimulation();
                     }
+
                     if (ImGui.MenuItem("Stop", "Ctrl+P", _playState == PlayState.Stopped, _playState != PlayState.Stopped))
                     {
                         StopSimulation();
@@ -1077,7 +1095,8 @@ namespace Engine.Editor
                     WindowState currentWindowState = _gs.Context.Window.WindowState;
                     if (currentWindowState == WindowState.FullScreen || currentWindowState == WindowState.BorderlessFullScreen)
                     {
-                        float xStart = ImGui.GetWindowWidth() - ImGui.GetLastItemRectMax().X - 6;
+                        //float xStart = ImGui.GetWindowContentRegionMax().X - ImGui.GetItemRectMax().X - 6;
+                        float xStart = ImGui.GetContentRegionAvail().X - 6; // TODO: Fix up from ^ this
                         ImGui.SameLine(0, xStart);
                         if (ImGui.Button("X"))
                         {
@@ -1134,7 +1153,7 @@ namespace Engine.Editor
                 {
                     ImGui.SetKeyboardFocusHere();
                 }
-                if (ImGui.InputText(string.Empty, _filenameInputBuffer.Buffer, _filenameInputBuffer.Length, InputTextFlags.EnterReturnsTrue, null))
+                if (ImGui.InputText(string.Empty, _filenameInputBuffer, (uint)_filenameInputBuffer.Length, ImGuiInputTextFlags.EnterReturnsTrue, null))
                 {
                     LoadProject(_filenameInputBuffer.ToString());
                     ImGui.CloseCurrentPopup();
@@ -1161,7 +1180,7 @@ namespace Engine.Editor
                 {
                     ImGui.SetKeyboardFocusHere();
                 }
-                if (ImGui.InputText(string.Empty, _filenameInputBuffer.Buffer, _filenameInputBuffer.Length, InputTextFlags.EnterReturnsTrue, null))
+                if (ImGui.InputText(string.Empty, _filenameInputBuffer, (uint)_filenameInputBuffer.Length, ImGuiInputTextFlags.EnterReturnsTrue, null))
                 {
                     LoadProject(_filenameInputBuffer.ToString());
                     ImGui.CloseCurrentPopup();
@@ -1541,15 +1560,15 @@ namespace Engine.Editor
             {
                 color = Vector4.Lerp(color, _disabledGrey, 0.5f);
             }
-            ImGui.PushStyleColor(ColorTarget.Text, color);
+            ImGui.PushStyleColor(ImGuiCol.Text, color);
             if (t.Children.Count > 0)
             {
-                ImGui.SetNextTreeNodeOpen(true, SetCondition.FirstUseEver);
+                ImGui.SetNextItemOpen(true, ImGuiCond.FirstUseEver);
                 bool opened = ImGui.TreeNode($"##{t.GameObject.ID}");
                 if (_newSelectedObject == t.GameObject)
                 {
                     _newSelectedObject = null;
-                    ImGui.SetScrollHere();
+                    ImGui.SetScrollHereY(); // TODO: I think X should be here?
                 }
                 ImGui.SameLine();
                 if (ImGui.Selectable($"{t.GameObject.Name}##{t.GameObject.ID}"))
@@ -1583,7 +1602,7 @@ namespace Engine.Editor
                 if (_newSelectedObject == t.GameObject)
                 {
                     _newSelectedObject = null;
-                    ImGui.SetScrollHere();
+                    ImGui.SetScrollHereY(); // TODO: I think X should be here?
                 }
 
                 if (ImGui.BeginPopupContextItem($"{t.GameObject.ID}_Context"))
@@ -1748,7 +1767,7 @@ namespace Engine.Editor
 
         private void MultiDrawObjects(ICollection<GameObject> gos)
         {
-            if (ImGui.CollapsingHeader($"Editing {gos.Count} selected GameObjects", "MultiDraw", true, true))
+            if (ImGui.CollapsingHeader($"Editing {gos.Count} selected GameObjects", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.FramePadding))
             {
                 MultiDrawTransform(gos);
 
@@ -1772,7 +1791,7 @@ namespace Engine.Editor
             Quaternion startRotation = t.LocalRotation;
 
             Vector3 pos = t.LocalPosition;
-            if (ImGui.DragVector3("Position", ref pos, -50f, 50f, 0.05f, "multi"))
+            if (ImGui.DragFloat3("Position", ref pos, 0.05f, -50f, 50f, "multi"))
             {
                 t.LocalPosition = pos;
                 c = new CompoundCommand(gos.Select(go => go.Transform)
@@ -1814,33 +1833,43 @@ namespace Engine.Editor
 
         private void DrawSingleObject(GameObject go)
         {
-            ImGui.PushStyleVar(StyleVar.FramePadding, new Vector2());
-            if (ImGui.BeginChildFrame((uint)"GoHeader".GetHashCode(), new Vector2(0, 25), WindowFlags.ShowBorders))
+            ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, new Vector2());
+
+            if (ImGui.BeginChild("GoHeader".GetHashCode().ToString(), new Vector2(0, 25), ImGuiChildFlags.None))
             {
+                // Enabled checkbox
                 bool enabled = go.Enabled;
                 if (ImGui.Checkbox("###GameObjectEnabled", ref enabled))
-                {
                     go.Enabled = enabled;
-                }
+
                 ImGui.SameLine(0, 5);
-                _goNameBuffer.StringValue = go.Name;
+
+                // Fill buffer only once when starting to edit
                 if (_focusNameField)
                 {
+                    Array.Clear(_goNameBuffer, 0, _goNameBuffer.Length);
+                    Encoding.UTF8.GetBytes(go.Name, 0, go.Name.Length, _goNameBuffer, 0);
+
                     ImGui.SetKeyboardFocusHere();
                     _focusNameField = false;
                 }
-                if (ImGui.InputText("###GoNameInput", _goNameBuffer.Buffer, _goNameBuffer.Length, InputTextFlags.Default, null))
+
+                // InputText
+                if (ImGui.InputText("###GoNameInput", _goNameBuffer, (uint)_goNameBuffer.Length, ImGuiInputTextFlags.None))
                 {
-                    go.Name = _goNameBuffer.ToString();
+                    // Update GameObject name after user edits
+                    go.Name = Encoding.UTF8.GetString(_goNameBuffer).TrimEnd('\0');
                 }
+
                 ImGui.SameLine();
                 ImGui.Text(go.ID.ToString());
 
+                ImGui.EndChild();
             }
 
-            ImGui.EndChildFrame();
             ImGui.PopStyleVar();
 
+            // Draw components
             int id = 0;
             foreach (var component in go.GetComponents<Component>())
             {
@@ -1856,16 +1885,17 @@ namespace Engine.Editor
             DrawNewComponentAdder(go);
         }
 
+
         private void DrawNewComponentAdder(GameObject go)
         {
-            ImGui.PushStyleColor(ColorTarget.Button, RgbaFloat.Red.ToVector4());
+            ImGui.PushStyleColor(ImGuiCol.Button, RgbaFloat.Red.ToVector4());
             if (ImGui.Button("Add New Component"))
             {
                 ImGui.OpenPopup("###NewComponentAdder");
             }
             ImGui.PopStyleColor();
 
-            ImGui.PushStyleColor(ColorTarget.Button, RgbaFloat.Blue.ToVector4());
+            ImGui.PushStyleColor(ImGuiCol.Button, RgbaFloat.Blue.ToVector4());
             if (_componentCopySource != null)
             {
                 if (ImGui.Button($"Paste {_componentCopySourceType}"))
@@ -1903,8 +1933,8 @@ namespace Engine.Editor
             {
                 color = Vector4.Lerp(color, _disabledGrey, 0.85f);
             }
-            ImGui.PushStyleColor(ColorTarget.Header, color);
-            if (ImGui.CollapsingHeader(type.Name, type.Name, true, true))
+            ImGui.PushStyleColor(ImGuiCol.Header, color);
+            if (ImGui.CollapsingHeader(type.Name, ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.FramePadding))
             {
                 if (ImGui.BeginPopupContextItem(type.Name + "_Context"))
                 {

@@ -2,14 +2,12 @@
 using ImGuiNET;
 using OpenTK;
 using OpenTK.Input;
-using System;
-using System.Collections.Generic;
 using System.Numerics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Veldrid;
 using Veldrid.Graphics;
 using Veldrid.Platform;
-using System.Runtime.InteropServices;
-
 using Key = Veldrid.Platform.Key;
 
 namespace Engine.Graphics
@@ -40,7 +38,7 @@ namespace Engine.Graphics
         {
             _rc = rc;
             _input = input;
-            ImGui.GetIO().FontAtlas.AddDefaultFont();
+            //ImGui.GetIO().FontAtlas.AddDefaultFont(); // TODO: Problematic
             _projectionMatrixProvider = new DynamicDataProvider<Matrix4x4>();
 
             InitializeContextObjects(rc);
@@ -89,24 +87,32 @@ namespace Engine.Graphics
         public unsafe void RecreateFontDeviceTexture(RenderContext rc)
         {
             var io = ImGui.GetIO();
-            // Build
-            _textureData = io.FontAtlas.GetTexDataAsRGBA32();
-            int[] pixels = new int[_textureData.Width * _textureData.Height];
-            for (int i = 0; i < pixels.Length; i++)
-            {
-                pixels[i] = ((int*)_textureData.Pixels)[i];
-            }
 
-            _fontTexture = new RawTextureDataArray<int>(pixels, _textureData.Width, _textureData.Height, _textureData.BytesPerPixel, PixelFormat.R8_G8_B8_A8);
+            // Get font texture data from ImGui
+            FontTextureData texData = io.FontAtlas.GetTexDataAsRGBA32();
+            int width = texData.Width;
+            int height = texData.Height;
+            int bytesPerPixel = texData.BytesPerPixel;
 
-            // Store our identifier
-            io.FontAtlas.SetTexID(_fontAtlasID);
+            // Copy pixel data to managed int array
+            int[] pixelData = new int[width * height];
+            Buffer.MemoryCopy(texData.Pixels, Unsafe.AsPointer(ref pixelData[0]), pixelData.Length * sizeof(int), pixelData.Length * sizeof(int));
 
-            var deviceTexture = rc.ResourceFactory.CreateTexture(_fontTexture.PixelData, _textureData.Width, _textureData.Height, _textureData.BytesPerPixel, PixelFormat.R8_G8_B8_A8);
+            // Create RawTextureDataArray using the copied data
+            _fontTexture = new RawTextureDataArray<int>(pixelData, width, height, bytesPerPixel, PixelFormat.R8_G8_B8_A8);
+
+            // Set ImGui font texture ID
+            int fontAtlasID = 1;
+            io.FontAtlas.SetTexID(fontAtlasID);
+
+            // Create GPU texture and binding
+            var deviceTexture = rc.ResourceFactory.CreateTexture(_fontTexture.PixelData, width, height, bytesPerPixel, PixelFormat.R8_G8_B8_A8);
             _fontTextureBinding = rc.ResourceFactory.CreateShaderTextureBinding(deviceTexture);
 
+            // Clear CPU-side font data
             io.FontAtlas.ClearTexData();
         }
+
 
         public IList<string> GetStagesParticipated()
         {

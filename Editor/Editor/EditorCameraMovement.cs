@@ -73,8 +73,8 @@ namespace Engine.Editor
             float yDelta = newMouseY - _previousMouseY;
 
             if (!_draggingOffWindow
-                && ((_input.GetMouseButtonDown(MouseButton.Left) || _input.GetMouseButtonDown(MouseButton.Middle) || _input.GetMouseButtonDown(MouseButton.Right))
-                && !ImGui.IsMouseHoveringAnyWindow()))
+                && (_input.GetMouseButtonDown(MouseButton.Left) || _input.GetMouseButtonDown(MouseButton.Middle) || _input.GetMouseButtonDown(MouseButton.Right))
+                && !ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow))
             {
                 _draggingOffWindow = true;
             }
@@ -103,7 +103,7 @@ namespace Engine.Editor
             _previousMouseX = newMouseX;
             _previousMouseY = newMouseY;
 
-            if (!ImGui.IsMouseHoveringAnyWindow())
+            if (!ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow))
             {
                 GameObject.Transform.Position += _input.CurrentSnapshot.WheelDelta * GameObject.Transform.Forward * _wheelZoomSpeed * deltaSeconds;
             }

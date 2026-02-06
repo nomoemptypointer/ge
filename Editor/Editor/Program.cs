@@ -3,8 +3,6 @@ using Engine.Graphics;
 using System.Runtime.InteropServices;
 using Veldrid.Platform;
 using Veldrid.Graphics;
-using System.IO;
-using System;
 using Engine.Physics;
 using Engine.Assets;
 using System.Reflection;
@@ -17,17 +15,22 @@ namespace Engine.Editor
     {
         public static void Main(string[] args)
         {
-            CommandLineOptions commandLineOptions = new CommandLineOptions(args);
+            CommandLineOptions commandLineOptions = new(args);
             // Force-load prefs.
             var prefs = EditorPreferences.Instance;
 
             OpenTKWindow window = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? (OpenTKWindow)new DedicatedThreadWindow(960, 540, WindowState.Maximized)
-                : new SameThreadWindow(960, 540, WindowState.Maximized);
-            window.Title = "ge.Editor";
-            Game game = new Game();
+                ? (OpenTKWindow)new DedicatedThreadWindow(960, 540, WindowState.Normal)
+                : new SameThreadWindow(960, 540, WindowState.Normal);
+
+            string windowTypeName = window.GetType().Name; // For debugging the blocking window issue
+            Console.WriteLine(windowTypeName);
+
+            //window.Title = "ge.Editor"; TODO: Why is this blocking the main thread????????
+            Game game = new();
+
             GraphicsBackEndPreference backEndPref = commandLineOptions.PreferOpenGL ? GraphicsBackEndPreference.OpenGL : GraphicsBackEndPreference.None;
-            GraphicsSystem gs = new GraphicsSystem(window, prefs.RenderQuality, backEndPref);
+            GraphicsSystem gs = new(window, prefs.RenderQuality, backEndPref);
             gs.Context.ResourceFactory.AddShaderLoader(new EmbeddedResourceShaderLoader(typeof(Program).GetTypeInfo().Assembly));
             game.SystemRegistry.Register(gs);
             game.LimitFrameRate = false;

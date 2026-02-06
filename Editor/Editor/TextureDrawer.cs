@@ -26,9 +26,9 @@ namespace Engine.Editor
 
             float ratio = (float)obj.Width / obj.Height;
 
-            Vector2 region = ImGui.GetContentRegionAvailable();
+            Vector2 region = ImGui.GetContentRegionAvail();
             float minDimension = Math.Min(500, Math.Min(region.X, region.Y)) - 50;
-            Vector2 imageDimensions = new Vector2(minDimension, minDimension / ratio);
+            Vector2 imageDimensions = new(minDimension, minDimension / ratio);
 
             ImGui.Image(id, imageDimensions, Vector2.Zero, Vector2.One, Vector4.One, Vector4.One);
 
