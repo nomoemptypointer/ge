@@ -11,7 +11,7 @@ namespace Engine
     {
         private static long s_latestAssignedID = 0;
 
-        private readonly MultiValueDictionary<Type, Component> _components = new MultiValueDictionary<Type, Component>();
+        private readonly Dictionary<Type, List<Component>> _components = [];
         private SystemRegistry _registry;
         private bool _enabled = true;
         private bool _enabledInHierarchy = true;
@@ -59,25 +59,45 @@ namespace Engine
 
         public void AddComponent(Component component)
         {
-            _components.Add(component.GetType(), component);
+            AddComponentInternal(component.GetType(), component);
             component.AttachToGameObject(this, _registry);
         }
 
         public void AddComponent<T>(T component) where T : Component
         {
-            _components.Add(typeof(T), component);
+            AddComponentInternal(typeof(T), component);
             component.AttachToGameObject(this, _registry);
+        }
+
+        private void AddComponentInternal(Type type, Component component)
+        {
+            if (!_components.TryGetValue(type, out var list))
+            {
+                list = [];
+                _components[type] = list;
+            }
+
+            list.Add(component);
+        }
+
+        private bool RemoveComponentInternal(Type type, Component component)
+        {
+            if (_components.TryGetValue(type, out var list))
+            {
+                bool removed = list.Remove(component);
+                if (list.Count == 0)
+                    _components.Remove(type);
+                return removed;
+            }
+            return false;
         }
 
         public void RemoveAll<T>() where T : Component
         {
-            IReadOnlyCollection<Component> components;
-            if (_components.TryGetValue(typeof(T), out components))
+            if (_components.TryGetValue(typeof(T), out var components))
             {
-                foreach (Component c in components)
-                {
+                foreach (var c in components)
                     c.InternalRemoved(_registry);
-                }
 
                 _components.Remove(typeof(T));
             }
@@ -86,12 +106,12 @@ namespace Engine
         public void RemoveComponent<T>(T component) where T : Component
         {
             component.InternalRemoved(_registry);
-            _components.Remove(typeof(T), component);
+            RemoveComponentInternal(typeof(T), component);
         }
 
         public void RemoveComponent(Component component)
         {
-            _components.Remove(component.GetType(), component);
+            RemoveComponentInternal(component.GetType(), component);
             component.InternalRemoved(_registry);
         }
 
@@ -102,23 +122,13 @@ namespace Engine
 
         public Component GetComponent(Type type)
         {
-            IReadOnlyCollection<Component> components;
-            if (!_components.TryGetValue(type, out components))
+            if (_components.TryGetValue(type, out var components))
+                return components.FirstOrDefault();
+
+            foreach (var kvp in _components)
             {
-                foreach (var kvp in _components)
-                {
-                    if (type.GetTypeInfo().IsAssignableFrom(kvp.Key))
-                    {
-                        if (kvp.Value.Any())
-                        {
-                            return kvp.Value.First();
-                        }
-                    }
-                }
-            }
-            else
-            {
-                return components.First();
+                if (type.IsAssignableFrom(kvp.Key) && kvp.Value.Count > 0)
+                    return kvp.Value[0];
             }
 
             return null;
@@ -150,25 +160,18 @@ namespace Engine
 
         public IEnumerable<T> GetComponents<T>() where T : Component
         {
-            IReadOnlyCollection<Component> components;
-            if (!_components.TryGetValue(typeof(T), out components))
-            {
-                foreach (var kvp in _components.ToArray())
-                {
-                    if (typeof(T).GetTypeInfo().IsAssignableFrom(kvp.Key))
-                    {
-                        foreach (var comp in kvp.Value.ToArray())
-                        {
-                            yield return (T)comp;
-                        }
-                    }
-                }
-            }
-            else
+            if (_components.TryGetValue(typeof(T), out var components))
             {
                 foreach (var comp in components)
-                {
                     yield return (T)comp;
+            }
+
+            foreach (var kvp in _components)
+            {
+                if (typeof(T).IsAssignableFrom(kvp.Key))
+                {
+                    foreach (var comp in kvp.Value)
+                        yield return (T)comp;
                 }
             }
         }

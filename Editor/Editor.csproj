@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<OutputType>Exe</OutputType>
+
+		<AssemblyName>Editor</AssemblyName>
+		<RootNamespace>Engine</RootNamespace>
+
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+
+		<RuntimeIdentifiers>
+			win-x64;
+			linux-x64;
+			osx-x64
+		</RuntimeIdentifiers>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\ext\imgui.net\src\ImGui.NET\ImGui.NET.csproj" />
+		<ProjectReference Include="..\ext\veldrid\src\Veldrid\Veldrid.csproj" />
+		<ProjectReference Include="..\ext\veldrid\src\Veldrid.Assets\Veldrid.Assets.csproj" />
+		<ProjectReference Include="..\ext\sharpfont\SharpFont\SharpFont.NETCore.csproj" />
+
+		<ProjectReference Include="..\BEPU\BEPUphysics\BEPUphysics.csproj" />
+		<ProjectReference Include="..\BEPU\BEPUutilities\BEPUutilities.csproj" />
+
+		<ProjectReference Include="..\Engine\Engine.csproj" />
+
+		<!-- Used only for content / build side effects -->
+		<ProjectReference Include="..\Engine.Launcher\Engine.Launcher.csproj"
+						  ReferenceOutputAssembly="false" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="Editor\Assets\GLSL\**\*.glsl" />
+		<EmbeddedResource Include="Editor\Assets\HLSL\**\*.hlsl" />
+		<EmbeddedResource Include="Editor\Assets\Models\*.obj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="SharpDX.XAudio2" Version="3.0.2" />
+		<PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+	</ItemGroup>
+
+	<Import Project="Editor.targets" />
+
+</Project>

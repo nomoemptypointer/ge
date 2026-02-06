@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<OutputType>Library</OutputType>
+
+		<AssemblyName>Engine</AssemblyName>
+		<RootNamespace>Engine</RootNamespace>
+
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="Assets\HLSL\**\*.hlsl" />
+		<EmbeddedResource Include="Assets\GLSL\**\*.glsl" />
+		<EmbeddedResource Include="Assets\Models\**\*.obj" />
+		<EmbeddedResource Include="Assets\Textures\**\*.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\ext\imgui.net\src\ImGui.NET\ImGui.NET.csproj" />
+		<ProjectReference Include="..\ext\veldrid\src\Veldrid\Veldrid.csproj" />
+		<ProjectReference Include="..\ext\veldrid\src\Veldrid.Assets\Veldrid.Assets.csproj" />
+		<ProjectReference Include="..\ext\sharpfont\SharpFont\SharpFont.NETCore.csproj" />
+
+		<ProjectReference Include="..\BEPU\BEPUphysics\BEPUphysics.csproj" />
+		<ProjectReference Include="..\BEPU\BEPUutilities\BEPUutilities.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="SharpDX.XAudio2" Version="3.0.2" />
+	</ItemGroup>
+
+</Project>
