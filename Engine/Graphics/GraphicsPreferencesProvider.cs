@@ -1,4 +1,5 @@
 ﻿using System;
+using Veldrid;
 
 namespace Engine.Graphics
 {
@@ -32,16 +33,16 @@ namespace Engine.Graphics
 
     public static class GraphicsPreferencesUtil
     {
-        public static Veldrid.Platform.WindowState MapPreferencesState(InitialWindowStatePreference state)
+        public static WindowState MapPreferencesState(InitialWindowStatePreference state)
         {
             switch (state)
             {
                 case InitialWindowStatePreference.Normal:
-                    return Veldrid.Platform.WindowState.Normal;
+                    return WindowState.Normal;
                 case InitialWindowStatePreference.ExclusiveFullScreen:
-                    return Veldrid.Platform.WindowState.FullScreen;
+                    return WindowState.FullScreen;
                 case InitialWindowStatePreference.BorderlessFullScreen:
-                    return Veldrid.Platform.WindowState.BorderlessFullScreen;
+                    return WindowState.BorderlessFullScreen;
                 default:
                     throw new InvalidOperationException("Illegal InitialWindowStatePreference: " + state);
             }

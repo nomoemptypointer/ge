@@ -2,6 +2,7 @@
 using SixLabors.ImageSharp;
 using System;
 using System.Reflection;
+using Veldrid;
 
 namespace Engine.Assets
 {

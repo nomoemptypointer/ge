@@ -1,13 +1,12 @@
 using Engine.Behaviors;
 using Engine.Graphics;
 using System.Runtime.InteropServices;
-using Veldrid.Platform;
-using Veldrid.Graphics;
 using Engine.Physics;
 using Engine.Assets;
 using System.Reflection;
 using Engine.ProjectSystem;
 using Engine.Audio;
+using Veldrid;
 
 namespace Engine.Editor
 {

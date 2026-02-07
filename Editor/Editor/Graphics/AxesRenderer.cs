@@ -1,5 +1,6 @@
 ﻿using BEPUutilities.DataStructures;
 using Engine.Graphics;
+using Engine.Graphics.Structs;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -311,7 +312,7 @@ namespace Engine.Editor.Graphics
         {
             if (ray.Intersects(Bounds))
             {
-                float distance = Vector3.Distance(Bounds.GetCenter(), ray.Origin);
+                float distance = Vector3.Distance(Bounds.Center, ray.Origin);
                 distances.Add(distance);
                 return 1;
             }

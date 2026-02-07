@@ -9,6 +9,7 @@ using Engine.Behaviors;
 using System.Runtime.InteropServices;
 using System.Linq;
 using Veldrid.Collections;
+using Engine.Graphics.Structs;
 
 namespace Engine.Graphics
 {

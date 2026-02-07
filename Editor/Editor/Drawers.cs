@@ -6,9 +6,8 @@ using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using Veldrid.Assets;
-using Veldrid.Graphics;
 using Engine.Physics;
+using Veldrid;
 
 namespace Engine.Editor
 {

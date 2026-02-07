@@ -1,3 +1,4 @@
+using Engine.Graphics.Structs;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -8,11 +9,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Veldrid;
-using Veldrid.Graphics;
-using Veldrid.Graphics.Direct3D;
-using Veldrid.Graphics.OpenGL;
-using Veldrid.Graphics.Pipeline;
-using Veldrid.Platform;
 
 namespace Engine.Graphics
 {

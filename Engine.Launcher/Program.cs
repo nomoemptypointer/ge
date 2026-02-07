@@ -11,8 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using Veldrid.Assets;
-using Veldrid.Platform;
+using Veldrid;
 
 namespace Engine
 {

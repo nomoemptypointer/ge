@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using Veldrid;
 using Veldrid.Graphics;
 
 namespace Engine.Graphics

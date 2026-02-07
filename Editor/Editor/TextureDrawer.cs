@@ -3,7 +3,6 @@ using ImGuiNET;
 using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using Veldrid.Graphics;
 
 namespace Engine.Editor
 {

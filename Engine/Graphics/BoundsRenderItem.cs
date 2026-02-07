@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Veldrid;
+﻿using Engine.Graphics.Structs;
 
 namespace Engine.Graphics
 {

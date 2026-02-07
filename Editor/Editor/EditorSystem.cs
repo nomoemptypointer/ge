@@ -12,20 +12,17 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
-using Veldrid.Graphics;
-using Veldrid.Platform;
-using Veldrid.Assets;
 using Engine.Editor.Commands;
 using Engine.GUI;
 using Engine.Editor.Graphics;
 using Engine.ProjectSystem;
 using Engine.Audio;
-using Veldrid.Graphics.Direct3D;
 using SharpDX.Direct3D11;
 using SharpFont;
 using Veldrid;
 using System.Runtime.InteropServices;
 using System.Text;
+using Engine.Graphics.Structs;
 
 namespace Engine.Editor
 {

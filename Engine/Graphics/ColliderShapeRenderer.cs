@@ -1,8 +1,8 @@
 ﻿using Engine.Assets;
+using Engine.Graphics.Structs;
 using Engine.Physics;
 using System.Numerics;
 using Veldrid;
-using Veldrid.Graphics;
 
 namespace Engine.Graphics
 {

@@ -20,6 +20,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Content Remove="C:\Users\mono\.nuget\packages\sharpfont\3.1.0\build\..\config\SharpFont.dll.config" />
+	</ItemGroup>
+
+	<ItemGroup>
 
 		<ProjectReference Include="..\BEPU\BEPUphysics\BEPUphysics.csproj" />
 		<ProjectReference Include="..\BEPU\BEPUutilities\BEPUutilities.csproj" />

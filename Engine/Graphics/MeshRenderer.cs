@@ -7,6 +7,8 @@ using Veldrid.Assets;
 using Engine.Assets;
 using Newtonsoft.Json;
 using System;
+using Engine.Graphics.Structs;
+using Engine.Graphics.Enums;
 
 namespace Engine.Graphics
 {

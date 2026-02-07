@@ -219,7 +219,8 @@ namespace Engine.Graphics
         {
             Position = position;
             TexCoords = texcoords;
-            Color = new RgbaByte((uint)color);
+            //Color = new RgbaByte((uint)color); // TODO: Reimplement
+            Color = RgbaByte.Pink;
         }
     }
 }

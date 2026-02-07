@@ -1,14 +1,11 @@
 ﻿using Engine.Behaviors;
+using Engine.Graphics.Structs;
 using ImGuiNET;
-using OpenTK;
-using OpenTK.Input;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Veldrid;
-using Veldrid.Graphics;
-using Veldrid.Platform;
-using Key = Veldrid.Platform.Key;
+using Veldrid.Sdl2;
 
 namespace Engine.Graphics
 {

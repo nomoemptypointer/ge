@@ -1,4 +1,5 @@
-﻿using Engine.Graphics.Structs;
+﻿using Engine.Graphics.Enums;
+using Engine.Graphics.Structs;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
