@@ -19,9 +19,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\ext\veldrid\src\Veldrid\Veldrid.csproj" />
-		<ProjectReference Include="..\ext\veldrid\src\Veldrid.Assets\Veldrid.Assets.csproj" />
-		<ProjectReference Include="..\ext\sharpfont\SharpFont\SharpFont.NETCore.csproj" />
 
 		<ProjectReference Include="..\BEPU\BEPUphysics\BEPUphysics.csproj" />
 		<ProjectReference Include="..\BEPU\BEPUutilities\BEPUutilities.csproj" />

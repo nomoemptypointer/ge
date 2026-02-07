@@ -20,10 +20,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\ext\imgui.net\src\ImGui.NET\ImGui.NET.csproj" />
-		<ProjectReference Include="..\ext\veldrid\src\Veldrid\Veldrid.csproj" />
-		<ProjectReference Include="..\ext\veldrid\src\Veldrid.Assets\Veldrid.Assets.csproj" />
-		<ProjectReference Include="..\ext\sharpfont\SharpFont\SharpFont.NETCore.csproj" />
 
 		<ProjectReference Include="..\BEPU\BEPUphysics\BEPUphysics.csproj" />
 		<ProjectReference Include="..\BEPU\BEPUutilities\BEPUutilities.csproj" />
@@ -31,6 +27,9 @@
 
 	<ItemGroup>
 		<PackageReference Include="SharpDX.XAudio2" Version="3.0.2" />
+		<PackageReference Include="SharpFont" Version="3.1.0" />
+		<PackageReference Include="Veldrid" Version="4.5.0" />
+		<PackageReference Include="Veldrid.SDL2" Version="4.9.0" />
 	</ItemGroup>
 
 </Project>

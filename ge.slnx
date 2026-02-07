@@ -1,11 +1,7 @@
 <Solution>
-  <Project Path="Engine/Engine.csproj" />
-  <Project Path="Engine.Launcher/Engine.Launcher.csproj" />
   <Project Path="BEPU/BEPUphysics/BEPUphysics.csproj" Id="c0d52c9f-14b8-4008-8ddc-109c27561a5c" />
   <Project Path="BEPU/BEPUutilities/BEPUutilities.csproj" Id="34853dea-43a6-4f2f-a379-d1ee04d256d2" />
   <Project Path="Editor/Editor.csproj" />
-  <Project Path="ext/imgui.net/src/ImGui.NET/ImGui.NET.csproj" />
-  <Project Path="ext/sharpfont/SharpFont/SharpFont.NETCore.csproj" />
-  <Project Path="ext/veldrid/src/Veldrid.Assets/Veldrid.Assets.csproj" />
-  <Project Path="ext/veldrid/src/Veldrid/Veldrid.csproj" />
+  <Project Path="Engine.Launcher/Engine.Launcher.csproj" />
+  <Project Path="Engine/Engine.csproj" />
 </Solution>

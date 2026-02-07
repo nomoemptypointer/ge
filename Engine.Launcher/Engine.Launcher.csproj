@@ -19,9 +19,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ext\imgui.net\src\ImGui.NET\ImGui.NET.csproj" />
-    <ProjectReference Include="..\ext\veldrid\src\Veldrid\Veldrid.csproj" />
-    <ProjectReference Include="..\ext\veldrid\src\Veldrid.Assets\Veldrid.Assets.csproj" />
     <ProjectReference Include="..\Engine\Engine.csproj" />
   </ItemGroup>
 
