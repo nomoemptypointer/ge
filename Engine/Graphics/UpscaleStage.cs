@@ -13,7 +13,7 @@ namespace Engine.Graphics
         private Material _quadMaterial;
         private ConstantDataProvider<Matrix4x4> _identityProvider = new ConstantDataProvider<Matrix4x4>(Matrix4x4.Identity);
 
-        public DeviceTexture2D SourceTexture
+        public Texture SourceTexture
         {
             get { return (DeviceTexture2D)_textureBinding?.BoundTexture; }
             set

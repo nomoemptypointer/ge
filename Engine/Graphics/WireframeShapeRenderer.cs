@@ -29,7 +29,7 @@ namespace Engine.Graphics
 
         public PrimitiveTopology Topology { get; set; } = PrimitiveTopology.TriangleList;
 
-        public WireframeShapeRenderer(RenderContext rc, RgbaFloat color)
+        public WireframeShapeRenderer(GraphicsDevice rc, RgbaFloat color)
         {
             _textureData = new RawTextureDataArray<RgbaFloat>(new RgbaFloat[] { color }, 1, 1, RgbaFloat.SizeInBytes, PixelFormat.R32_G32_B32_A32_Float);
 
@@ -96,7 +96,7 @@ namespace Engine.Graphics
             return s_stages;
         }
 
-        public void Render(RenderContext rc, string pipelineStage)
+        public void Render(GraphicsDevice rc, string pipelineStage)
         {
             UpdateBuffers(rc);
 
@@ -111,7 +111,7 @@ namespace Engine.Graphics
             rc.RasterizerState = rasterState;
         }
 
-        private void UpdateBuffers(RenderContext rc)
+        private void UpdateBuffers(GraphicsDevice rc)
         {
             var factory = rc.ResourceFactory;
             _vertices.Clear();
@@ -143,7 +143,7 @@ namespace Engine.Graphics
     {
         private Octree<T> _octree;
 
-        public OctreeRenderer(Octree<T> octree, RenderContext rc) : base(rc, RgbaFloat.Red)
+        public OctreeRenderer(Octree<T> octree, GraphicsDevice rc) : base(rc, RgbaFloat.Red)
         {
             _octree = octree;
         }
@@ -235,7 +235,7 @@ namespace Engine.Graphics
     {
         private BoundingFrustum _frustum;
 
-        public FrustumWireframeRenderer(BoundingFrustum frustum, RenderContext rc)
+        public FrustumWireframeRenderer(BoundingFrustum frustum, GraphicsDevice rc)
             : base(rc, RgbaFloat.Cyan)
         {
             _frustum = frustum;
@@ -313,7 +313,7 @@ namespace Engine.Graphics
     {
         private BoundingBox _box;
 
-        public BoundingBoxWireframeRenderer(BoundingBox box, RenderContext rc)
+        public BoundingBoxWireframeRenderer(BoundingBox box, GraphicsDevice rc)
             : base(rc, RgbaFloat.Cyan)
         {
             _box = box;
@@ -392,7 +392,7 @@ namespace Engine.Graphics
     {
         private BoundsRenderItem _bri;
 
-        public BoundsRenderItemWireframeRenderer(BoundsRenderItem bri, RenderContext rc)
+        public BoundsRenderItemWireframeRenderer(BoundsRenderItem bri, GraphicsDevice rc)
             : base(bri.Bounds, rc)
         {
             _bri = bri;
@@ -410,7 +410,7 @@ namespace Engine.Graphics
         {
             if (ray.Intersects(Bounds))
             {
-                distance = Vector3.Distance(_bri.Bounds.GetCenter(), ray.Origin);
+                distance = Vector3.Distance(_bri.Bounds.Center, ray.Origin);
                 return true;
             }
             else
@@ -424,7 +424,7 @@ namespace Engine.Graphics
         {
             if (ray.Intersects(Bounds))
             {
-                float distance = Vector3.Distance(_bri.Bounds.GetCenter(), ray.Origin);
+                float distance = Vector3.Distance(_bri.Bounds.Center, ray.Origin);
                 distances.Add(distance);
                 return 1;
             }
@@ -441,7 +441,7 @@ namespace Engine.Graphics
 
     public class ManualWireframeRenderer : WireframeShapeRenderer
     {
-        public ManualWireframeRenderer(RenderContext rc, RgbaFloat color) : base(rc, color)
+        public ManualWireframeRenderer(GraphicsDevice rc, RgbaFloat color) : base(rc, color)
         {
         }
 

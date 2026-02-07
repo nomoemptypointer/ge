@@ -1,7 +1,6 @@
 ﻿using Engine.Assets;
 using OpenTK.Audio.OpenAL;
 using System;
-using Veldrid.Assets;
 
 namespace Engine.Audio
 {

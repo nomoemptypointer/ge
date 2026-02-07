@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Threading;
-
-namespace Engine
+﻿namespace Engine
 {
     public class SynchronizationHelperSystem : GameSystem
     {
-        private Queue<Action> _activeQueue = new Queue<Action>();
-        private Queue<Action> _bufferedQueue = new Queue<Action>();
+        private Queue<Action> _activeQueue = new();
+        private Queue<Action> _bufferedQueue = new();
 
         public void QueueMainThreadAction(Action a)
         {

@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-using Veldrid.Graphics;
-using System;
+﻿using Veldrid;
 
 namespace Engine.Graphics
 {
     public static class ImGuiImageHelper
     {
-        private static readonly Dictionary<DeviceTexture, ShaderTextureBindingInfo> s_textureBindings = new Dictionary<DeviceTexture, ShaderTextureBindingInfo>();
+        private static readonly Dictionary<Texture, ShaderTextureBindingInfo> s_textureBindings = new Dictionary<Texture, ShaderTextureBindingInfo>();
         private static Dictionary<IntPtr, ShaderTextureBindingInfo> s_bindings = new Dictionary<IntPtr, ShaderTextureBindingInfo>();
         private static int s_lastAssigned = 100;
 
@@ -22,13 +20,13 @@ namespace Engine.Graphics
             }
         }
 
-        public static IntPtr GetOrCreateImGuiBinding(RenderContext rc, DeviceTexture texture)
+        public static IntPtr GetOrCreateImGuiBinding(GraphicsDevice rc, Texture texture)
         {
             var deviceBinding = rc.ResourceFactory.CreateShaderTextureBinding(texture);
             return GetOrCreateImGuiBinding(rc, deviceBinding);
         }
 
-        public static IntPtr GetOrCreateImGuiBinding(RenderContext rc, ShaderTextureBinding stb)
+        public static IntPtr GetOrCreateImGuiBinding(GraphicsDevice rc, ShaderTextureBinding stb)
         {
             ShaderTextureBindingInfo stbi;
 

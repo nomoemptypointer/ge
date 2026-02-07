@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Veldrid.Graphics;
+using Veldrid;
 
 namespace Engine.Graphics
 {
@@ -20,7 +20,7 @@ namespace Engine.Graphics
         }
 
         public Material GetMaterial(
-            RenderContext rc,
+            GraphicsDevice rc,
             string vertexShaderName,
             string pixelShaderName,
             MaterialVertexInput vertexInputs,
@@ -32,7 +32,7 @@ namespace Engine.Graphics
         }
 
         public Task<Material> GetMaterialAsync(
-            RenderContext rc,
+            GraphicsDevice rc,
             string vertexShaderName,
             string pixelShaderName,
             MaterialVertexInput vertexInputs,

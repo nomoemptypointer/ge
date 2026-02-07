@@ -5,8 +5,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using Veldrid.Graphics;
-using Veldrid.Graphics.OpenGL;
+using Veldrid;
 
 namespace Engine
 {
@@ -19,9 +18,8 @@ namespace Engine
                 fs.WriteLine(e.ToString());
                 fs.WriteLine();
                 fs.WriteLine(RuntimeInformation.OSDescription);
-                RenderContext renderContext = game.SystemRegistry.GetSystem<GraphicsSystem>().Context;
-                string backend = renderContext is OpenGLRenderContext ? "OpenGL" : "Direct3D11";
-                fs.WriteLine($"Using {backend} backend.");
+                GraphicsDevice renderContext = game.SystemRegistry.GetSystem<GraphicsSystem>().Context;
+                fs.WriteLine($"Using {renderContext.BackendType} backend.");
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
                     fs.WriteLine("GPU Devices:");
@@ -32,7 +30,7 @@ namespace Engine
                     }
                 }
 
-                fs.WriteLine($"Resolution: {renderContext.Window.Width}x{renderContext.Window.Height}");
+                //fs.WriteLine($"Resolution: {renderContext.Window.Width}x{renderContext.Window.Height}"); TODO: Get Window from GS
 
                 var audioEngine = game.SystemRegistry.GetSystem<AudioSystem>().Engine;
                 fs.WriteLine($"Audio Engine: {audioEngine.GetType()}");

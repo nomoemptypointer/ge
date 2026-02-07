@@ -1,7 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
-using Veldrid.Assets;
-using Veldrid;
+﻿using Engine.Assets;
+using Newtonsoft.Json;
 
 namespace Engine
 {

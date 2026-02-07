@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using Veldrid.Assets;
-
-namespace Engine.Assets
+﻿namespace Engine.Assets
 {
     public class CompoundAssetDatabase : AssetDatabase
     {

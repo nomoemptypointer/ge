@@ -15,7 +15,7 @@ namespace Engine.Editor
     {
         public Type TypeDrawn { get; }
 
-        public bool Draw(string label, ref object obj, RenderContext rc)
+        public bool Draw(string label, ref object obj, GraphicsDevice rc)
         {
             ImGui.PushID(label);
 
@@ -34,8 +34,8 @@ namespace Engine.Editor
             return result;
         }
 
-        protected abstract bool DrawNonNull(string label, ref object obj, RenderContext rc);
-        protected virtual bool DrawNewItemSelector(string label, ref object obj, RenderContext rc)
+        protected abstract bool DrawNonNull(string label, ref object obj, GraphicsDevice rc);
+        protected virtual bool DrawNewItemSelector(string label, ref object obj, GraphicsDevice rc)
         {
             ImGui.Text(label + ": NULL ");
             ImGui.SameLine();
@@ -194,7 +194,7 @@ namespace Engine.Editor
     {
         public Drawer() : base(typeof(T)) { }
 
-        protected sealed override bool DrawNonNull(string label, ref object obj, RenderContext rc)
+        protected sealed override bool DrawNonNull(string label, ref object obj, GraphicsDevice rc)
         {
             T tObj;
             try
@@ -211,10 +211,10 @@ namespace Engine.Editor
             return result;
         }
 
-        public abstract bool Draw(string label, ref T obj, RenderContext rc);
+        public abstract bool Draw(string label, ref T obj, GraphicsDevice rc);
     }
 
-    public delegate bool DrawFunc<T>(string label, ref T obj, RenderContext rc);
+    public delegate bool DrawFunc<T>(string label, ref T obj, GraphicsDevice rc);
     public class FuncDrawer<T> : Drawer<T>
     {
         private readonly DrawFunc<T> _drawFunc;
@@ -228,7 +228,7 @@ namespace Engine.Editor
 
         public FuncDrawer(Action<T> drawFunc, Func<object> newFunc = null)
         {
-            _drawFunc = (string label, ref T obj, RenderContext rc) =>
+            _drawFunc = (string label, ref T obj, GraphicsDevice rc) =>
             {
                 drawFunc(obj);
                 return false;
@@ -237,7 +237,7 @@ namespace Engine.Editor
             _newFunc = newFunc;
         }
 
-        public override bool Draw(string label, ref T obj, RenderContext rc)
+        public override bool Draw(string label, ref T obj, GraphicsDevice rc)
         {
             return _drawFunc(label, ref obj, rc);
         }
@@ -257,7 +257,7 @@ namespace Engine.Editor
 
     public static class GenericDrawFuncs
     {
-        public static unsafe bool DrawString(string label, ref string s, RenderContext rc)
+        public static unsafe bool DrawString(string label, ref string s, GraphicsDevice rc)
         {
             bool result = false;
 
@@ -291,7 +291,7 @@ namespace Engine.Editor
             return string.Empty;
         }
 
-        public static bool DrawInt(string label, ref int i, RenderContext rc)
+        public static bool DrawInt(string label, ref int i, GraphicsDevice rc)
         {
             ImGui.PushItemWidth(50f);
             bool result = ImGui.DragInt(label, ref i, 1f, int.MinValue, int.MaxValue, i.ToString());
@@ -299,7 +299,7 @@ namespace Engine.Editor
             return result;
         }
 
-        public static bool DrawSingle(string label, ref float f, RenderContext rc)
+        public static bool DrawSingle(string label, ref float f, GraphicsDevice rc)
         {
             ImGui.PushItemWidth(50f);
             bool result = ImGui.DragFloat(label, ref f, -1000f, 1000f, 0.05f, f.ToString(), ImGuiSliderFlags.None); // TODO: 1f = ImGuiSliderFlags ?
@@ -307,7 +307,7 @@ namespace Engine.Editor
             return result;
         }
 
-        public static bool DrawByte(string label, ref byte b, RenderContext rc)
+        public static bool DrawByte(string label, ref byte b, GraphicsDevice rc)
         {
             ImGui.PushItemWidth(50f);
             int val = b;
@@ -321,12 +321,12 @@ namespace Engine.Editor
             return false;
         }
 
-        public static bool DrawBool(string label, ref bool b, RenderContext rc)
+        public static bool DrawBool(string label, ref bool b, GraphicsDevice rc)
         {
             return ImGui.Checkbox(label, ref b);
         }
 
-        internal static bool DrawRgbaFloat(string label, ref RgbaFloat obj, RenderContext rc)
+        internal static bool DrawRgbaFloat(string label, ref RgbaFloat obj, GraphicsDevice rc)
         {
             var color = obj.ToVector4();
             bool result = ImGui.ColorEdit4(label, ref color, ImGuiColorEditFlags.NoSmallPreview); // TODO: This ImGuiColorEditFlags was true
@@ -338,22 +338,22 @@ namespace Engine.Editor
             return result;
         }
 
-        internal static bool DrawVector2(string label, ref Vector2 obj, RenderContext rc)
+        internal static bool DrawVector2(string label, ref Vector2 obj, GraphicsDevice rc)
         {
             return ImGui.DragFloat2(label, ref obj, float.MinValue, float.MaxValue, .1f);
         }
 
-        internal static bool DrawVector3(string label, ref Vector3 obj, RenderContext rc)
+        internal static bool DrawVector3(string label, ref Vector3 obj, GraphicsDevice rc)
         {
             return ImGui.DragFloat3(label, ref obj, float.MinValue, float.MaxValue, .1f);
         }
 
-        internal static bool DrawVector4(string label, ref Vector4 obj, RenderContext rc)
+        internal static bool DrawVector4(string label, ref Vector4 obj, GraphicsDevice rc)
         {
             return ImGui.DragFloat4(label, ref obj, float.MinValue, float.MaxValue, .1f);
         }
 
-        internal static bool DrawQuaternion(string label, ref Quaternion obj, RenderContext rc)
+        internal static bool DrawQuaternion(string label, ref Quaternion obj, GraphicsDevice rc)
         {
             Vector3 euler = MathUtil.RadiansToDegrees(MathUtil.GetEulerAngles(obj));
             if (DrawVector3(label, ref euler, rc))
@@ -376,7 +376,7 @@ namespace Engine.Editor
             _enumOptions = Enum.GetNames(enumType);
         }
 
-        protected override bool DrawNonNull(string label, ref object obj, RenderContext rc)
+        protected override bool DrawNonNull(string label, ref object obj, GraphicsDevice rc)
         {
             bool result = false;
             string menuLabel = $"{label}: {obj.ToString()}";
@@ -406,7 +406,7 @@ namespace Engine.Editor
             _isValueType = typeof(T).GetTypeInfo().IsValueType;
         }
 
-        protected override bool DrawNonNull(string label, ref object obj, RenderContext rc)
+        protected override bool DrawNonNull(string label, ref object obj, GraphicsDevice rc)
         {
             T[] arr = (T[])obj;
             int length = arr.Length;
@@ -519,7 +519,7 @@ namespace Engine.Editor
                 .Where(pi => !pi.IsDefined(typeof(JsonIgnoreAttribute))).ToArray();
         }
 
-        protected override bool DrawNonNull(string label, ref object obj, RenderContext rc)
+        protected override bool DrawNonNull(string label, ref object obj, GraphicsDevice rc)
         {
             ImGui.PushID(label);
 
@@ -573,12 +573,12 @@ namespace Engine.Editor
             _subTypes = type.GetTypeInfo().Assembly.GetTypes().Where(t => type.IsAssignableFrom(t) && !t.GetTypeInfo().IsAbstract).ToArray();
         }
 
-        protected override bool DrawNonNull(string label, ref object obj, RenderContext rc)
+        protected override bool DrawNonNull(string label, ref object obj, GraphicsDevice rc)
         {
             throw new InvalidOperationException("AbstractItemDrawer shouldn't be used for non-null items.");
         }
 
-        protected override bool DrawNewItemSelector(string label, ref object obj, RenderContext rc)
+        protected override bool DrawNewItemSelector(string label, ref object obj, GraphicsDevice rc)
         {
             bool result = false;
 

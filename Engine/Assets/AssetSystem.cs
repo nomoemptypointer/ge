@@ -4,7 +4,6 @@ using Newtonsoft.Json;
 using SharpFont;
 using System;
 using System.IO;
-using Veldrid.Assets;
 
 namespace Engine.Assets
 {

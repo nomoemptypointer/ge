@@ -8,22 +8,6 @@ namespace Engine
     {
         public static readonly float TwoPi = (float)(Math.PI * 2.0);
 
-        public static float Clamp(float value, float min, float max)
-        {
-            if (value <= min)
-            {
-                return min;
-            }
-            else if (value >= max)
-            {
-                return max;
-            }
-            else
-            {
-                return value;
-            }
-        }
-
         public static float Lerp(float from, float to, float t)
         {
             return (from * (1 - t)) + (to * t);

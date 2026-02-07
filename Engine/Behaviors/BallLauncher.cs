@@ -4,6 +4,7 @@ using System.Numerics;
 using System;
 using BEPUphysics.PositionUpdating;
 using System.Threading.Tasks;
+using Veldrid;
 
 namespace Engine.Behaviors
 {

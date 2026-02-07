@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Veldrid;
+using Veldrid.Sdl2;
 
 namespace Engine.Graphics
 {
@@ -21,7 +22,7 @@ namespace Engine.Graphics
 
         private static readonly ConstantDataProvider<Matrix4x4> s_identityProvider = new ConstantDataProvider<Matrix4x4>(Matrix4x4.Identity);
 
-        private readonly Window _window;
+        private readonly Sdl2Window _window;
         private readonly Renderer _renderer;
         private readonly PipelineStage[] _pipelineStages;
         private readonly OctreeVisibilityManager _visiblityManager = new OctreeVisibilityManager();
@@ -60,7 +61,7 @@ namespace Engine.Graphics
 
         public BufferCache BufferCache { get; }
 
-        public RenderContext Context { get; }
+        public GraphicsDevice Context { get; }
 
         public Camera MainCamera => _mainCamera;
 
@@ -78,11 +79,11 @@ namespace Engine.Graphics
 
         public ShaderTextureBinding StandardStageDepthView => _upscaleDepthView;
 
-        public GraphicsSystem(OpenTKWindow window, GraphicsPreferencesProvider preferences)
+        public GraphicsSystem(Sdl2Window window, GraphicsPreferencesProvider preferences)
             : this(window, preferences.RenderQuality, preferences.BackEndPreference)
         { }
 
-        public GraphicsSystem(OpenTKWindow window, float renderQuality = 1f, GraphicsBackEndPreference backEndPreference = GraphicsBackEndPreference.None)
+        public GraphicsSystem(Sdl2Window window, float renderQuality = 1f, GraphicsBackEndPreference backEndPreference = GraphicsBackEndPreference.None)
         {
             if (window == null)
             {

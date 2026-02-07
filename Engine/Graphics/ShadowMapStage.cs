@@ -1,8 +1,7 @@
-﻿using System;
+﻿using Engine.Graphics.Structs;
+using System;
 using System.Numerics;
 using Veldrid;
-using Veldrid.Graphics;
-using Veldrid.Graphics.Pipeline;
 
 namespace Engine.Graphics
 {
@@ -17,18 +16,18 @@ namespace Engine.Graphics
         private readonly DynamicDataProvider<Matrix4x4> _lightProjectionProvider = new DynamicDataProvider<Matrix4x4>();
 
         private Framebuffer _shadowMapFramebuffer;
-        private DeviceTexture2D _depthTexture;
+        private Texture _depthTexture;
 
         public bool Enabled { get; set; } = true;
 
         public string Name => "ShadowMap";
 
-        public RenderContext RenderContext { get; private set; }
+        public GraphicsDevice RenderContext { get; private set; }
 
         public DirectionalLight Light { get; set; }
         public Camera MainCamera { get; set; }
 
-        public ShadowMapStage(RenderContext rc, string contextBindingName = "ShadowMap")
+        public ShadowMapStage(GraphicsDevice rc, string contextBindingName = "ShadowMap")
         {
             RenderContext = rc;
             _contextBindingName = contextBindingName;
@@ -36,13 +35,13 @@ namespace Engine.Graphics
             rc.RegisterGlobalDataProvider("LightProjMatrix", _lightProjectionProvider);
         }
 
-        public void ChangeRenderContext(RenderContext rc)
+        public void ChangeRenderContext(GraphicsDevice rc)
         {
             RenderContext = rc;
             InitializeContextObjects(rc);
         }
 
-        private void InitializeContextObjects(RenderContext rc)
+        private void InitializeContextObjects(GraphicsDevice rc)
         {
             _depthTexture = rc.ResourceFactory.CreateDepthTexture(DepthMapWidth, DepthMapHeight, sizeof(ushort), PixelFormat.Alpha_UInt16);
             _shadowMapFramebuffer = rc.ResourceFactory.CreateFramebuffer();
@@ -91,7 +90,7 @@ namespace Engine.Graphics
                 MainCamera.FieldOfViewRadians,
                 MainCamera.NearPlaneDistance,
                 MainCamera.FarPlaneDistance,
-                (float)RenderContext.Window.Width / (float)RenderContext.Window.Height,
+                (float)RenderContext.Window.Width / (float)RenderContext.Window.Height, // TODO: We need to get the window from GS
                 out corners);
 
             // Approach used: http://alextardif.com/ShadowMapping.html

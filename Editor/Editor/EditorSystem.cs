@@ -858,7 +858,7 @@ namespace Engine.Editor
 
         private void DrawMainMenu()
         {
-            string openPopup = null;
+            string openPopup = "";
 
             if (ImGui.BeginMainMenuBar())
             {
@@ -872,7 +872,7 @@ namespace Engine.Editor
                         string[] history =
                             _projectContext != null
                                 ? EditorPreferences.Instance.GetProjectSceneHistory(_projectContext.ProjectRootPath).ToArray()
-                                : Array.Empty<string>();
+                                : [];
                         if (ImGui.BeginMenu($"Recently Opened", history.Any()))
                         {
                             foreach (string path in history.Reverse())

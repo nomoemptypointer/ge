@@ -1,4 +1,5 @@
 ﻿using Engine.Assets;
+using Engine.Graphics.Enums;
 using Engine.Graphics.Structs;
 using Engine.Physics;
 using System.Numerics;
@@ -13,7 +14,7 @@ namespace Engine.Graphics
 
         public GameObject GameObject { get { return _gameObject; } set { _gameObject = value; } }
 
-        public ColliderShapeRenderer(AssetSystem assetSystem, RenderContext rc, RgbaFloat color) : base(rc, color)
+        public ColliderShapeRenderer(AssetSystem assetSystem, GraphicsDevice rc, RgbaFloat color) : base(rc, color)
         {
             _assetSystem = assetSystem;
         }

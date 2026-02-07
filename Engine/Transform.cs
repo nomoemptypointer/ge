@@ -432,9 +432,6 @@ namespace Engine
         {
         }
 
-        public override string ToString()
-        {
-            return $"[Transform] {GameObject.ToString()}";
-        }
+        public override string ToString() => $"[Transform] {GameObject}";
     }
 }

@@ -25,21 +25,20 @@ namespace Engine.Graphics
         private ShaderTextureBinding _fontTextureBinding;
 
         private int _fontAtlasID = 1;
-        private RenderContext _rc;
+        private GraphicsDevice _rc;
         private readonly InputSystem _input;
         private bool _controlDown;
         private bool _shiftDown;
         private bool _altDown;
 
-        public ImGuiRenderer(RenderContext rc, NativeWindow window, InputSystem input)
+        public ImGuiRenderer(GraphicsDevice rc, Sdl2Window window, InputSystem input)
         {
             _rc = rc;
             _input = input;
-            //ImGui.GetIO().FontAtlas.AddDefaultFont(); // TODO: Problematic
+            //ImGui.GetIO().FontAtlas.AddDefaultFont(); // TODO: Problematic (once updated will be fixed, 2 projects were interfering)
             _projectionMatrixProvider = new DynamicDataProvider<Matrix4x4>();
 
             InitializeContextObjects(rc);
-            SetOpenTKKeyMappings();
 
             SetPerFrameImGuiData(rc, 1f / 60f);
 
@@ -48,7 +47,7 @@ namespace Engine.Graphics
             input.RegisterCallback(OnInputUpdated);
         }
 
-        private void InitializeContextObjects(RenderContext rc)
+        private void InitializeContextObjects(GraphicsDevice rc)
         {
             ResourceFactory factory = rc.ResourceFactory;
             _vertexBuffer = factory.CreateVertexBuffer(500, false);
@@ -81,7 +80,7 @@ namespace Engine.Graphics
 
         }
 
-        public unsafe void RecreateFontDeviceTexture(RenderContext rc)
+        public unsafe void RecreateFontDeviceTexture(GraphicsDevice rc)
         {
             var io = ImGui.GetIO();
 
@@ -110,13 +109,12 @@ namespace Engine.Graphics
             io.FontAtlas.ClearTexData();
         }
 
-
         public IList<string> GetStagesParticipated()
         {
             return CommonStages.Overlay;
         }
 
-        public unsafe void Render(RenderContext rc, string pipelineStage)
+        public unsafe void Render(GraphicsDevice rc, string pipelineStage)
         {
             ImGui.Render();
             RenderImDrawData(ImGui.GetDrawData(), rc);
@@ -132,7 +130,7 @@ namespace Engine.Graphics
             SetPerFrameImGuiData(_rc, deltaSeconds);
         }
 
-        public unsafe void SetPerFrameImGuiData(RenderContext rc, float deltaSeconds)
+        public unsafe void SetPerFrameImGuiData(GraphicsDevice rc, float deltaSeconds)
         {
             IO io = ImGui.GetIO();
             io.DisplaySize = new System.Numerics.Vector2(
@@ -148,7 +146,7 @@ namespace Engine.Graphics
             ImGui.NewFrame();
         }
 
-        private unsafe void UpdateImGuiInput(OpenTKWindow window, InputSnapshot snapshot)
+        private unsafe void UpdateImGuiInput(Sdl2Window window, InputSnapshot snapshot)
         {
             IO io = ImGui.GetIO();
             MouseState cursorState = Mouse.GetCursorState();
@@ -216,33 +214,7 @@ namespace Engine.Graphics
             io.ShiftPressed = _shiftDown;
         }
 
-        private static unsafe void SetOpenTKKeyMappings()
-        {
-            // TODO: Sdl2 Key mappings
-
-            //IO io = ImGui.GetIO();
-            //io.KeyMap[GuiKey.Tab] = (int)Key.Tab;
-            //io.KeyMap[GuiKey.LeftArrow] = (int)Key.Left;
-            //io.KeyMap[GuiKey.RightArrow] = (int)Key.Right;
-            //io.KeyMap[GuiKey.UpArrow] = (int)Key.Up;
-            //io.KeyMap[GuiKey.DownArrow] = (int)Key.Down;
-            //io.KeyMap[GuiKey.PageUp] = (int)Key.PageUp;
-            //io.KeyMap[GuiKey.PageDown] = (int)Key.PageDown;
-            //io.KeyMap[GuiKey.Home] = (int)Key.Home;
-            //io.KeyMap[GuiKey.End] = (int)Key.End;
-            //io.KeyMap[GuiKey.Delete] = (int)Key.Delete;
-            //io.KeyMap[GuiKey.Backspace] = (int)Key.BackSpace;
-            //io.KeyMap[GuiKey.Enter] = (int)Key.Enter;
-            //io.KeyMap[GuiKey.Escape] = (int)Key.Escape;
-            //io.KeyMap[GuiKey.A] = (int)Key.A;
-            //io.KeyMap[GuiKey.C] = (int)Key.C;
-            //io.KeyMap[GuiKey.V] = (int)Key.V;
-            //io.KeyMap[GuiKey.X] = (int)Key.X;
-            //io.KeyMap[GuiKey.Y] = (int)Key.Y;
-            //io.KeyMap[GuiKey.Z] = (int)Key.Z;
-        }
-
-        private unsafe void RenderImDrawData(DrawData* draw_data, RenderContext rc)
+        private unsafe void RenderImDrawData(DrawData* draw_data, GraphicsDevice rc)
         {
             VertexDescriptor descriptor = new VertexDescriptor((byte)sizeof(DrawVert), 3, 0, IntPtr.Zero);
 

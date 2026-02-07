@@ -5,16 +5,15 @@ namespace Engine
 {
     public class SystemRegistry
     {
-        private Dictionary<Type, GameSystem> _systems = new Dictionary<Type, GameSystem>();
+        private Dictionary<Type, GameSystem> _systems = [];
 
         public T GetSystem<T>() where T : GameSystem
         {
-            GameSystem gs;
-            if (!_systems.TryGetValue(typeof(T), out gs))
+            if (!_systems.TryGetValue(typeof(T), out GameSystem gs))
             {
                 throw new InvalidOperationException($"No system of type {typeof(T).Name} was found.");
             }
-            
+
             return (T)gs;
         }
         

@@ -1,5 +1,4 @@
 ﻿using Engine.Assets;
-using Veldrid.Assets;
 
 namespace Engine.Editor
 {

@@ -45,7 +45,7 @@ namespace Engine.Behaviors
                 _currentYaw += -xDelta * 0.01f;
                 _currentPitch += -yDelta * 0.01f;
 
-                _currentPitch = MathUtil.Clamp(_currentPitch, ((float)-Math.PI / 2f) + .01f, ((float)Math.PI / 2f) - .01f);
+                _currentPitch = Math.Clamp(_currentPitch, ((float)-Math.PI / 2f) + .01f, ((float)Math.PI / 2f) - .01f);
 
                 _cc.Controller.ViewDirection = Transform.Forward;
             }

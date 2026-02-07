@@ -1,7 +1,5 @@
 ﻿using Engine.Assets;
 using Engine.Physics;
-using System.Collections.Generic;
-using Veldrid.Assets;
 
 namespace Engine.ProjectSystem
 {

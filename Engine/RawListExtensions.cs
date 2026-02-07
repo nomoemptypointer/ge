@@ -1,5 +1,4 @@
 ﻿using BEPUutilities.DataStructures;
-using System;
 
 namespace Engine
 {

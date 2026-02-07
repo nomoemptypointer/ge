@@ -100,7 +100,7 @@ namespace Engine.Graphics
         // Private device resources -- to be disposed.
         private DeviceBuffer _vb;
         private DeviceBuffer _ib;
-        private DeviceTexture _deviceTexture;
+        private Texture _deviceTexture;
         private ShaderTextureBinding _textureBinding;
 
         // Shared device resources
@@ -125,7 +125,7 @@ namespace Engine.Graphics
             get { return _materialInfo.Data.Opacity; }
             set
             {
-                float newVal = MathUtil.Clamp(value, 0f, 1f);
+                float newVal = Math.Clamp(value, 0f, 1f);
                 float oldVal = _materialInfo.Data.Opacity;
                 if (newVal != oldVal)
                 {

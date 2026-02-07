@@ -1,8 +1,10 @@
 ﻿using Engine.Graphics;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using System;
 using System.Reflection;
 using Veldrid;
+using Veldrid.ImageSharp;
 
 namespace Engine.Assets
 {
@@ -69,7 +71,7 @@ namespace Engine.Assets
         {
             using (var stream = s_engineAssembly.GetManifestResourceStream(embeddedName))
             {
-                return new ImageSharpTexture(Image.Load(stream));
+                return new ImageSharpTexture(Image.Load<Rgba32>(stream));
             }
         }
     }
