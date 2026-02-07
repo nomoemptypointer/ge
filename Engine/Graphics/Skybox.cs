@@ -1,11 +1,10 @@
 using Engine.Assets;
+using Engine.Graphics.Structs;
 using SixLabors.ImageSharp;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
 using Veldrid;
-using Veldrid.Assets;
-using Veldrid.Graphics;
 
 namespace Engine.Graphics
 {
@@ -31,8 +30,8 @@ namespace Engine.Graphics
         private ConstantBufferDataProvider _perObjectInput;
 
         // Context objects
-        private VertexBuffer _vb;
-        private IndexBuffer _ib;
+        private DeviceBuffer _vb;
+        private DeviceBuffer _ib;
         private Material _material;
         private ShaderTextureBinding _cubemapBinding;
         private RasterizerState _rasterizerState;
@@ -259,8 +258,8 @@ namespace Engine.Graphics
             }
         }
 
-        private static readonly VertexPosition[] s_vertices = new VertexPosition[]
-        {
+        private static readonly VertexPosition[] s_vertices =
+        [
             // Top
             new VertexPosition(new Vector3(-20.0f,20.0f,-20.0f)),
             new VertexPosition(new Vector3(20.0f,20.0f,-20.0f)),
@@ -291,7 +290,7 @@ namespace Engine.Graphics
             new VertexPosition(new Vector3(20.0f,20.0f,20.0f)),
             new VertexPosition(new Vector3(20.0f,-20.0f,20.0f)),
             new VertexPosition(new Vector3(-20.0f,-20.0f,20.0f)),
-        };
+        ];
 
         private static readonly int[] s_indices = new int[]
         {

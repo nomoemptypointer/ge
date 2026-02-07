@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Numerics;
-using Veldrid.Graphics;
+using Veldrid;
 
 namespace Engine.Graphics
 {
@@ -12,8 +12,8 @@ namespace Engine.Graphics
 
     public unsafe class TextBuffer : IDisposable
     {
-        private IndexBuffer _ib;
-        private VertexBuffer _vb;
+        private DeviceBuffer _ib;
+        private DeviceBuffer _vb;
         private Material _material;
         private int _filledIndexCount;
         private int _characterCount;

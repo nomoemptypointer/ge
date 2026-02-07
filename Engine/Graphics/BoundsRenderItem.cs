@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Veldrid;
-using Veldrid.Graphics;
 
 namespace Engine.Graphics
 {

@@ -4,8 +4,6 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Numerics;
 using Veldrid;
-using Veldrid.Assets;
-using Veldrid.Graphics;
 using System;
 using Engine.Behaviors;
 using System.Runtime.InteropServices;
@@ -33,7 +31,7 @@ namespace Engine.Graphics
         private RefOrImmediate<TextureData> _textureRef;
         private TextureData _texture;
 
-        private VertexBuffer _instanceDataVB;
+        private DeviceBuffer _instanceDataVB;
         private IndexBuffer _ib;
         private Material _material;
         private DeviceTexture _deviceTexture;

@@ -1,5 +1,4 @@
-﻿using System;
-using Veldrid.Graphics;
+﻿using Veldrid;
 
 namespace Engine.Graphics
 {

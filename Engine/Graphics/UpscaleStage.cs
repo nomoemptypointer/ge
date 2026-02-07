@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Numerics;
-using Veldrid.Graphics;
-using Veldrid.Graphics.Pipeline;
-using Veldrid.Platform;
+using Veldrid;
 
 namespace Engine.Graphics
 {
@@ -10,8 +8,8 @@ namespace Engine.Graphics
     {
         private Framebuffer _outputFramebuffer;
         private ShaderTextureBinding _textureBinding;
-        private VertexBuffer _quadVB;
-        private IndexBuffer _quadIB;
+        private DeviceBuffer _quadVB;
+        private DeviceBuffer _quadIB;
         private Material _quadMaterial;
         private ConstantDataProvider<Matrix4x4> _identityProvider = new ConstantDataProvider<Matrix4x4>(Matrix4x4.Identity);
 

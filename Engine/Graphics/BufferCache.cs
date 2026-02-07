@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Veldrid.Graphics;
+using Veldrid;
 
 namespace Engine.Graphics
 {
@@ -10,7 +10,7 @@ namespace Engine.Graphics
         private readonly GraphicsSystem _gs;
         private readonly ResourceFactory _factory;
 
-        private ConcurrentDictionary<BufferKey, VertexBuffer> _vbs = new ConcurrentDictionary<BufferKey, VertexBuffer>();
+        private ConcurrentDictionary<BufferKey, DeviceBuffer> _vbs = new ConcurrentDictionary<BufferKey, DeviceBuffer>();
         private ConcurrentDictionary<BufferKey, IndexBufferAndCount> _ibs = new ConcurrentDictionary<BufferKey, IndexBufferAndCount>();
 
         public BufferCache(GraphicsSystem gs)
@@ -19,9 +19,9 @@ namespace Engine.Graphics
             _factory = gs.Context.ResourceFactory;
         }
 
-        public VertexBuffer GetVertexBuffer(MeshData mesh)
+        public DeviceBuffer GetVertexBuffer(MeshData mesh)
         {
-            VertexBuffer vb;
+            DeviceBuffer vb;
             BufferKey key = new BufferKey(mesh);
             if (!_vbs.TryGetValue(key, out vb))
             {
@@ -36,12 +36,12 @@ namespace Engine.Graphics
             return vb;
         }
 
-        public async Task<VertexBuffer> GetVertexBufferAsync(MeshData mesh)
+        public async Task<DeviceBuffer> GetVertexBufferAsync(MeshData mesh)
         {
             return await _gs.ExecuteOnMainThread(() => GetVertexBuffer(mesh));
         }
 
-        public IndexBuffer GetIndexBuffer(MeshData mesh, out int indexCount)
+        public DeviceBuffer GetIndexBuffer(MeshData mesh, out int indexCount)
         {
             IndexBufferAndCount bufferAndCount = GetIndexBufferAndCount(mesh);
             indexCount = bufferAndCount.IndexCount;
@@ -89,10 +89,10 @@ namespace Engine.Graphics
 
         public struct IndexBufferAndCount
         {
-            public readonly IndexBuffer Buffer;
+            public readonly DeviceBuffer Buffer;
             public readonly int IndexCount;
 
-            public IndexBufferAndCount(IndexBuffer buffer, int indexCount)
+            public IndexBufferAndCount(DeviceBuffer buffer, int indexCount)
             {
                 Buffer = buffer;
                 IndexCount = indexCount;

@@ -1,10 +1,8 @@
 ﻿using Engine.Graphics;
 using Engine.Physics;
-using Veldrid.Graphics;
 using System.Numerics;
 using System;
 using BEPUphysics.PositionUpdating;
-using Veldrid.Platform;
 using System.Threading.Tasks;
 
 namespace Engine.Behaviors

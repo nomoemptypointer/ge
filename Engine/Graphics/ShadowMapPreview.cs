@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Numerics;
 using Veldrid;
-using Veldrid.Graphics;
 
 namespace Engine.Graphics
 {
@@ -11,8 +10,8 @@ namespace Engine.Graphics
         private readonly DynamicDataProvider<Matrix4x4> _worldMatrixProvider = new DynamicDataProvider<Matrix4x4>();
         private readonly DynamicDataProvider<Matrix4x4> _projectionMatrixProvider = new DynamicDataProvider<Matrix4x4>();
 
-        private VertexBuffer _vertexBuffer;
-        private IndexBuffer _indexBuffer;
+        private DeviceBuffer _vertexBuffer;
+        private DeviceBuffer _indexBuffer;
         private Material _material;
         private float _imageWidth = 200f;
         private DepthStencilState _depthDisabledState;

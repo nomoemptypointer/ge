@@ -1,25 +1,20 @@
-﻿using OpenTK.Input;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Numerics;
-using Veldrid.Platform;
-using System.Runtime.InteropServices;
+﻿using System.Numerics;
+using Veldrid;
+using Veldrid.Sdl2;
 
 namespace Engine
 {
     public class InputSystem : GameSystem
     {
-        private readonly Window _window;
+        private readonly Sdl2Window _window;
 
-        private readonly HashSet<Veldrid.Platform.Key> _currentlyPressedKeys = new HashSet<Veldrid.Platform.Key>();
-        private readonly HashSet<Veldrid.Platform.Key> _newKeysThisFrame = new HashSet<Veldrid.Platform.Key>();
+        private readonly HashSet<Key> _currentlyPressedKeys = [];
+        private readonly HashSet<Key> _newKeysThisFrame = [];
 
-        private readonly HashSet<Veldrid.Platform.MouseButton> _currentlyPressedMouseButtons = new HashSet<Veldrid.Platform.MouseButton>();
-        private readonly HashSet<Veldrid.Platform.MouseButton> _newMouseButtonsThisFrame = new HashSet<Veldrid.Platform.MouseButton>();
+        private readonly HashSet<MouseButton> _currentlyPressedMouseButtons = [];
+        private readonly HashSet<MouseButton> _newMouseButtonsThisFrame = [];
 
-        private readonly List<Action<InputSystem>> _callbacks = new List<Action<InputSystem>>();
+        private readonly List<Action<InputSystem>> _callbacks = [];
 
         private Vector2 _previousSnapshotMousePosition;
 
@@ -31,21 +26,23 @@ namespace Engine
             }
             set
             {
-                if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                {
-                    Point screenPosition = _window.ClientToScreen(new Point((int)value.X, (int)value.Y));
-                    Mouse.SetPosition(screenPosition.X, screenPosition.Y);
-                    var cursorState = Mouse.GetCursorState();
-                    Point windowPoint = _window.ScreenToClient(new Point(cursorState.X, cursorState.Y));
-                    _previousSnapshotMousePosition = new Vector2(windowPoint.X / _window.ScaleFactor.X, windowPoint.Y / _window.ScaleFactor.Y);
-                }
-                else
-                {
-                    Point screenPosition = new Point((int)value.X, (int)value.Y);
-                    Mouse.SetPosition(screenPosition.X, screenPosition.Y);
-                    var cursorState = Mouse.GetCursorState();
-                    _previousSnapshotMousePosition = new Vector2(cursorState.X / _window.ScaleFactor.X, cursorState.Y / _window.ScaleFactor.Y);
-                }
+                // TODO: Rewrite, this can be skipped since this won't get used much
+
+                //if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                //{
+                //    Point screenPosition = _window.ClientToScreen(new Point((int)value.X, (int)value.Y));
+                //    Mouse.SetPosition(screenPosition.X, screenPosition.Y);
+                //    var cursorState = Mouse.GetCursorState();
+                //    Point windowPoint = _window.ScreenToClient(new Point(cursorState.X, cursorState.Y));
+                //    _previousSnapshotMousePosition = new Vector2(windowPoint.X / _window.ScaleFactor.X, windowPoint.Y / _window.ScaleFactor.Y);
+                //}
+                //else
+                //{
+                //    Point screenPosition = new Point((int)value.X, (int)value.Y);
+                //    Mouse.SetPosition(screenPosition.X, screenPosition.Y);
+                //    var cursorState = Mouse.GetCursorState();
+                //    _previousSnapshotMousePosition = new Vector2(cursorState.X / _window.ScaleFactor.X, cursorState.Y / _window.ScaleFactor.Y);
+                //}
             }
         }
 
@@ -53,7 +50,7 @@ namespace Engine
 
         public InputSnapshot CurrentSnapshot { get; private set; }
 
-        public InputSystem(Window window)
+        public InputSystem(Sdl2Window window)
         {
             _window = window;
             window.FocusGained += WindowFocusGained;
@@ -71,11 +68,10 @@ namespace Engine
 
         protected override void UpdateCore(float deltaSeconds)
         {
-            UpdateFrameInput(_window.GetInputSnapshot());
+            var snapshot = _window.PumpEvents();
+            UpdateFrameInput(snapshot);
             foreach (var callback in _callbacks)
-            {
                 callback(this);
-            }
         }
 
         public void WindowFocusLost()
@@ -101,22 +97,22 @@ namespace Engine
             _newMouseButtonsThisFrame.Clear();
         }
 
-        public bool GetKey(Veldrid.Platform.Key Key)
+        public bool GetKey(Key Key)
         {
             return _currentlyPressedKeys.Contains(Key);
         }
 
-        public bool GetKeyDown(Veldrid.Platform.Key Key)
+        public bool GetKeyDown(Key Key)
         {
             return _newKeysThisFrame.Contains(Key);
         }
 
-        public bool GetMouseButton(Veldrid.Platform.MouseButton button)
+        public bool GetMouseButton(MouseButton button)
         {
             return _currentlyPressedMouseButtons.Contains(button);
         }
 
-        public bool GetMouseButtonDown(Veldrid.Platform.MouseButton button)
+        public bool GetMouseButtonDown(MouseButton button)
         {
             return _newMouseButtonsThisFrame.Contains(button);
         }
@@ -158,13 +154,13 @@ namespace Engine
             }
         }
 
-        private void MouseUp(Veldrid.Platform.MouseButton MouseButton)
+        private void MouseUp(MouseButton MouseButton)
         {
             _currentlyPressedMouseButtons.Remove(MouseButton);
             _newMouseButtonsThisFrame.Remove(MouseButton);
         }
 
-        private void MouseDown(Veldrid.Platform.MouseButton MouseButton)
+        private void MouseDown(MouseButton MouseButton)
         {
             if (_currentlyPressedMouseButtons.Add(MouseButton))
             {
@@ -172,13 +168,13 @@ namespace Engine
             }
         }
 
-        private void KeyUp(Veldrid.Platform.Key Key)
+        private void KeyUp(Key Key)
         {
             _currentlyPressedKeys.Remove(Key);
             _newKeysThisFrame.Remove(Key);
         }
 
-        private void KeyDown(Veldrid.Platform.Key Key)
+        private void KeyDown(Key Key)
         {
             if (_currentlyPressedKeys.Add(Key))
             {

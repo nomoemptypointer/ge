@@ -96,8 +96,8 @@ namespace Engine.Graphics
         }
 
         // Private device resources -- to be disposed.
-        private VertexBuffer _vb;
-        private IndexBuffer _ib;
+        private DeviceBuffer _vb;
+        private DeviceBuffer _ib;
         private DeviceTexture _deviceTexture;
         private ShaderTextureBinding _textureBinding;
 

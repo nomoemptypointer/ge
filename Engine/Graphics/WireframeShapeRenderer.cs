@@ -1,10 +1,9 @@
-﻿using System;
+﻿using Engine.Graphics.Structs;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Reflection;
 using Veldrid;
-using Veldrid.Assets;
-using Veldrid.Graphics;
 
 namespace Engine.Graphics
 {
@@ -12,8 +11,8 @@ namespace Engine.Graphics
     {
         private readonly RawTextureDataArray<RgbaFloat> _textureData;
 
-        private VertexBuffer _vb;
-        private IndexBuffer _ib;
+        private DeviceBuffer _vb;
+        private DeviceBuffer _ib;
         private Material _material;
         private DeviceTexture _texture;
         private ShaderTextureBinding _textureBinding;

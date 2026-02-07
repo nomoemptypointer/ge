@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using Veldrid;
-using Veldrid.Graphics;
 
 namespace Engine.Editor.Graphics
 {
@@ -16,16 +15,16 @@ namespace Engine.Editor.Graphics
         private readonly DynamicDataProvider<Matrix4x4> _worldProvider = new DynamicDataProvider<Matrix4x4>();
         private readonly GraphicsSystem _gs;
 
-        private VertexBuffer _vb;
-        private IndexBuffer _ib;
+        private DeviceBuffer _vb;
+        private DeviceBuffer _ib;
         private Material _material;
         private DepthStencilState _dss;
         private RasterizerState _rs;
         private int _lineIndicesCount;
         private readonly RawList<VertexPositionColor> _vertices = new RawList<VertexPositionColor>(30);
 
-        private readonly VertexBuffer _pointerVB;
-        private readonly IndexBuffer _pointerIB;
+        private readonly DeviceBuffer _pointerVB;
+        private readonly DeviceBuffer _pointerIB;
         private readonly int _pointerIndexCount;
         private readonly Material _pointerMaterial;
         private readonly DeviceTexture _redTexture;
